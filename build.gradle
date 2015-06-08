@@ -1,0 +1,40 @@
+apply plugin:'wrapper'
+apply plugin:'groovy'
+apply plugin:'idea'
+
+wrapper {
+    gradleVersion = '2.4'
+}
+
+buildDir = project.file('target')
+
+group = 'ch.raffael.gradlePlugins.antlr4'
+version = '1.0-SNAPSHOT'
+
+archivesBaseName = 'gradle-antlr4-plugin'
+
+sourceCompatibility='1.7'
+
+repositories {
+    jcenter()
+}
+
+configurations {
+    antlrTool
+}
+
+dependencies {
+    compile localGroovy()
+    compile gradleApi()
+
+    antlrTool group:'org.antlr', name:'antlr4', version:'4.5'
+}
+
+sourceSets {
+    main.compileClasspath += configurations.antlrTool
+    test.compileClasspath += configurations.antlrTool
+}
+
+idea.module {
+    scopes.PROVIDED.plus += [ configurations.antlrTool ]
+}
