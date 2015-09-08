@@ -11,7 +11,7 @@ wrapper {
 buildDir = project.file('target')
 
 group = 'ch.raffael.gradlePlugins.antlr4'
-version = '1.0-SNAPSHOT'
+version = '1.0'
 
 archivesBaseName = 'gradle-antlr4-plugin'
 
@@ -26,7 +26,6 @@ configurations {
 }
 
 dependencies {
-//    compile group: 'org.codehaus.groovy', name: 'groovy-all', version: '2.3.10'
     compile gradleApi()
 
     testCompile group: 'org.spockframework', name: 'spock-core', version: '1.0-groovy-2.3', {
