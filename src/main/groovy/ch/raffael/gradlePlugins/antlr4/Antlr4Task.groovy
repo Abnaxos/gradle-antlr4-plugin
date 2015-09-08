@@ -25,6 +25,7 @@
 package ch.raffael.gradlePlugins.antlr4
 
 import org.gradle.api.DefaultTask
+import org.gradle.api.GradleException
 import org.gradle.api.file.FileVisitDetails
 import org.gradle.api.tasks.*
 
@@ -38,6 +39,11 @@ import java.util.regex.Pattern
 class Antlr4Task extends DefaultTask {
 
     public static final String STANDARD_RUNTIME_PACKAGE = 'org.antlr.v4.runtime'
+
+    private static final Map<String,Integer> GRAMMAR_TYPE_ORDERING = [
+            parser: 1,
+            lexer: -1,
+    ]
 
     @Input
     @Optional
@@ -103,25 +109,33 @@ class Antlr4Task extends DefaultTask {
             }
         }
         boolean hadError = false
+        List<GrammarFile> grammarFiles = []
         project.fileTree(dir:source, include:'**/*.g4').visit { FileVisitDetails file ->
-            if ( file.isDirectory() ) {
+            if (file.isDirectory()) {
                 return
             }
-            def fileOut = project.file("$generateDir/$file.relativePath.parent")
-            project.mkdir(fileOut)
+            def grammarFile = new GrammarFile(
+                    inputFile: file.file,
+                    outputDir: project.file("$generateDir/$file.relativePath.parent"),
+                    packageName: file.relativePath.parent.segments.join('.'))
+            grammarFile.readFileType()
+            grammarFiles.add grammarFile
+        }
+        grammarFiles.sort(true, GrammarFile.COMPILE_ORDER).each { file ->
+            project.mkdir(file.outputDir)
             def antlrArgs = []
-            antlrArgs << '-o' << fileOut
-            antlrArgs << '-package' << file.relativePath.parent.segments.join('.')
+            antlrArgs << '-o' << file.outputDir
+            antlrArgs << '-package' << file.packageName
             antlrArgs << (listener ? '-listener' : '-no-listener')
             antlrArgs << (visitor ? '-visitor' : '-no-visitor')
-            antlrArgs << file.file
+            antlrArgs << file.inputFile
             logger.debug('Calling ANTLR with arguments {}', antlrArgs)
             if ( !runner.run(logger, antlrArgs as String[]) ) {
                 hadError = true
             }
         }
         if ( hadError ) {
-            throw new Exception("Some grammars contained ANTLR errors")
+            throw new GradleException("Some grammars contained ANTLR errors")
         }
     }
 
