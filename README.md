@@ -50,6 +50,18 @@ antlr4 {
 ```
 
 
+Compile Order
+-------------
+
+The plugin orders the grammar files as follows:
+
+ 1. lexer grammars
+ 2. combined grammars
+ 3. parser grammars
+
+This is a very simple mechanism that makes sure that split grammars will compile correctly. For more complex cases, however, this may not be enough, as the plugin currently doesn't build a dependency graph based on the `import` statements. This may be added to the plugin at a later point.
+
+
 Preshadow Example
 -----------------
 
@@ -90,14 +102,3 @@ antlr4 {
 }
 
 ```
-
-Compile Order
--------------
-
-The plugin orders the grammar files as follows:
-
- 1. lexer grammars
- 2. combined grammars
- 3. parser grammars
-
-This is a very simple mechanism that makes sure that split grammars will compile correctly. For more complex cases, however, this may not be enough, as the plugin currently doesn't build a dependency graph based on the `import` statements. This may be added to the plugin at a later point.
