@@ -91,14 +91,13 @@ antlr4 {
 
 ```
 
+Compile Order
+-------------
 
-Future
-------
+The plugin orders the grammar files as follows:
 
-Also, I'll add a feature to compile lexer grammars before parser grammars. A parser grammar won't compile if its lexer grammar hasn't been compiled yet. A future version of the plugin will pre-scan the source files and ensure the following order in compilation:
+ 1. lexer grammars
+ 2. combined grammars
+ 3. parser grammars
 
- *  `lexer grammar X;`
- *  `grammar X;` (combined grammar)
- *  `parser grammar X;`
-
-I'm not sure about how to handle grammer imports yet. But there are definitely plans to handle these ANTLR features correctly.
+This is a very simple mechanism that makes sure that split grammars will compile correctly. For more complex cases, however, this may not be enough, as the plugin currently doesn't build a dependency graph based on the `import` statements. This may be added to the plugin at a later point.
